@@ -2,6 +2,7 @@ import Link from 'next/link';
 import PageContainer from '@/components/layout/page-container';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { listKapFindings } from '@/features/kap/api/service';
+import { kapStatusCategory } from '@/features/kap/status';
 
 export const metadata = { title: 'Dashboard : Temuan KAP' };
 const normalized = (value: string | null) => (value ?? '').trim().toLowerCase();
@@ -26,18 +27,18 @@ export default async function KapPage({
     },
     {
       label: 'Sudah Ditindaklanjuti',
-      count: rows.filter((r) => normalized(r.statusTindakLanjut) === 'sudah').length,
+      count: rows.filter((r) => kapStatusCategory(r.statusTindakLanjut) === 'sudah').length,
       description: 'Berstatus sudah'
     },
     {
       label: 'Dalam Proses',
-      count: rows.filter((r) => normalized(r.statusTindakLanjut) === 'dalam proses').length,
-      description: 'Sedang dalam proses'
+      count: rows.filter((r) => kapStatusCategory(r.statusTindakLanjut) === 'proses').length,
+      description: 'Dalam proses atau menunggu verifikasi'
     },
     {
       label: 'Belum Ditindaklanjuti',
-      count: rows.filter((r) => normalized(r.statusTindakLanjut) === 'belum').length,
-      description: 'Berstatus belum'
+      count: rows.filter((r) => kapStatusCategory(r.statusTindakLanjut) === 'belum').length,
+      description: 'Belum atau belum ada bukti tindak lanjut'
     }
   ];
   const statuses = [

@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import postgres from 'postgres';
 import * as XLSX from 'xlsx';
+import { fileURLToPath } from 'node:url';
 
 dotenv.config({ path: '.env.local', quiet: true });
 if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
@@ -15,8 +16,12 @@ const text = (path: string, rowOffset: number, column: number) => {
   const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: '' });
   return rows.slice(rowOffset).filter((row) => clean(row[column]));
 };
-const file2024 = '/Users/kiram/Code/keuangan/data/KAP/Matrik Managemen Letter KAP Tahun 2024.xlsx';
-const file2025 = '/Users/kiram/Code/keuangan/data/KAP/Matriks_Tindak_Lanjut_ML_USK_2025.xlsx';
+const file2024 = fileURLToPath(
+  new URL('../data/KAP/Matrik Managemen Letter KAP Tahun 2024.xlsx', import.meta.url)
+);
+const file2025 = fileURLToPath(
+  new URL('../data/KAP/Matriks_Tindak_Lanjut_ML_USK_2025.xlsx', import.meta.url)
+);
 const rows2024 = text(file2024, 1, 4);
 const rows2025 = text(file2025, 3, 3);
 if (rows2024.length !== 19 || rows2025.length !== 28)
