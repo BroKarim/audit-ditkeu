@@ -15,32 +15,56 @@ import { NavGroup } from '@/types';
  */
 export const navGroups: NavGroup[] = [
   {
-    label: 'Overview',
+    label: '',
     items: [
       {
-        title: 'Dashboard',
+        title: 'BPK',
         url: '/dashboard/overview',
-        icon: 'dashboard',
+        icon: 'bpk',
         isActive: false,
         shortcut: ['d', 'd'],
         items: []
       },
       {
+        title: 'KAP',
+        url: '/dashboard/kap',
+        icon: 'kap',
+        isActive: false,
+        shortcut: ['d', 'd'],
+        items: []
+      },
+      {
+        title: 'BPKP',
+        url: '/dashboard/bpkp',
+        icon: 'bpkp',
+        isActive: false,
+        shortcut: ['d', 'd'],
+        items: []
+      },
+      {
+        title: 'ITJEN',
+        url: '/dashboard/itjen',
+        icon: 'itjen',
+        isActive: false,
+        shortcut: ['d', 'd'],
+        items: []
+      }
+    ]
+  },
+  {
+    label: 'Setting',
+    items: [
+      {
         title: 'Akses & Peran',
         url: '/dashboard/access',
-        icon: 'account',
+        icon: 'teams',
         shortcut: ['a', 'a'],
         isActive: false,
         items: [],
         // Admin-only: the sidebar hides it for other roles (UX), and the
         // page + server actions enforce the same rule server-side.
         access: { role: 'admin' }
-      }
-    ]
-  },
-  {
-    label: '',
-    items: [
+      },
       {
         title: 'Account',
         url: '#',

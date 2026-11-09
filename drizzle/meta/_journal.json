@@ -43,6 +43,27 @@
       "when": 1790908638277,
       "tag": "0005_add_user_names",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794193600035,
+      "tag": "0006_cute_annihilus",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794193610949,
+      "tag": "0007_charming_jack_murdock",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794198548956,
+      "tag": "0008_hot_hulk",
+      "breakpoints": true
     }
   ]
 }

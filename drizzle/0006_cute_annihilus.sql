@@ -1,0 +1,21 @@
+CREATE TABLE "kap_findings" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"tahun" integer NOT NULL,
+	"satker" text,
+	"kode_satker" text,
+	"judul_pemeriksaan" text,
+	"uraian_temuan" text NOT NULL,
+	"kode_rekomendasi" text,
+	"uraian_rekomendasi" text NOT NULL,
+	"nilai_temuan" numeric(18, 2),
+	"tanggapan_manajemen" text,
+	"komitmen_manajemen" text,
+	"status_tindak_lanjut" text,
+	"deskripsi_tindak_lanjut" text,
+	"hasil_akhir" text,
+	"action_plan" text,
+	"sisa" text,
+	"keterangan" text,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);

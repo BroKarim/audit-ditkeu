@@ -6,6 +6,7 @@ import {
   IconBell,
   IconBold,
   IconBox,
+  IconBuildingBank,
   IconBrandGithub,
   IconBrandTwitter,
   IconBrightness,
@@ -70,6 +71,7 @@ import {
   IconSend,
   IconSettings,
   IconShare,
+  IconShieldCheck,
   IconSlash,
   IconSparkles,
   IconStack2,
@@ -128,6 +130,10 @@ export const Icons = {
 
   // Layout
   dashboard: IconLayoutDashboard,
+  bpk: IconBuildingBank,
+  kap: IconClipboardText,
+  bpkp: IconShieldCheck,
+  itjen: IconStack2,
   kanban: IconLayoutKanban,
   panelLeft: IconLayoutSidebar,
 

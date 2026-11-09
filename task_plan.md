@@ -6,7 +6,7 @@ Mengimplementasikan UI tahap pertama dashboard monitoring temuan BPK USK pada co
 
 ## Status
 
-`in_progress` — Phase 1–7 `complete`; Phase 8 langkah 1–4 `complete` di branch `feat/import-guards-cleanup` (guard impor, cleanup mock, verifikasi teknis) dan **Phase 9 `complete`** di branch `feat/browser-verification-fixes` (perbaikan hasil verifikasi browser + simplifikasi role + trim template + perf). Sisa tunggal: **Phase 8 langkah 5 — merge `feat/admin-actions` → `dev` → `main`** (dan merge branch `feat/browser-verification-fixes`). Ringkasan kronologis ada di `progress.md`, detail skema/data di `docs/data.md`.
+`in_progress` — Phase 1–9 mengikuti catatan di bawah; Phase 10 sedang dikerjakan pada branch `codex/import-bpk-kap-schema`. Ringkasan kronologis ada di `progress.md`, detail skema/data di `docs/data.md`.
 
 ## Phases
 
@@ -182,6 +182,38 @@ Aplikasi internal → role dipangkas menjadi **`user`** dan **`admin`** (`c18321
 - Belum di-merge ke `dev`/`main`.
 - `use-breadcrumbs`/users demo masih mock (sesuai keputusan mempertahankan halaman users).
 - Warning `nuqs` (`limitUrlUpdates: debounce` dengan `shallow` default) masih muncul di console — pre-existing, belum ditindak.
+
+### Phase 10 — Dasar data KAP dan impor XLSX BPK
+
+Status: `in_progress` — migrasi tabel KAP sudah diterapkan. Workbook BPK diimpor: 148 dibuat, 0 gagal, 45 dilewati (10 `Input SIPTL`, 35 tanpa kode temuan); penyelesaian baris yang dilewati menunggu data/padanan status.
+
+Halaman ringkasan dan detail KAP telah dibuat. Workbook KAP 2023 diimpor ke `kap_findings`; baris tanpa uraian temuan dilewati, sedangkan uraian rekomendasi kosong tetap boleh disimpan sebagai `NULL`.
+
+#### Penyesuaian KAP (implementasi lanjutan)
+
+- `kap_findings` hanya menyimpan `id`, `tahun`, tujuh kolom isi (uraian temuan, uraian rekomendasi, nilai temuan, tanggapan manajemen, status tindak lanjut, deskripsi tindak lanjut, hasil akhir), serta timestamp.
+- Tujuh kolom isi nullable. Nilai teks kosong/spasi dinormalisasi menjadi `NULL`; nilai numerik nol yang benar tetap nol. Halaman KAP menampilkan nilai kosong tanpa teks pengganti.
+- Migration menghapus kolom KAP tambahan dan membersihkan baris KAP yang sudah ada. Aturan ini tidak mengubah tabel BPK.
+
+#### Cakupan
+
+- Aplikasi memiliki empat sumber/menu temuan: **BPK, KAP, Itjen, dan BPKP**. Phase ini menyiapkan tabel KAP dan memasukkan workbook BPK; pemisahan UI/menu dan sumber Itjen/BPKP ditangani pada pekerjaan lanjutan.
+- Siapkan tabel khusus KAP dengan kolom minimal yang disepakati dan satu record per temuan; workbook KAP 2023 sudah dimasukkan.
+- Jangan mengubah tabel `findings` BPK. Impor `data/BPK/SILAHAP_TEMUAN_20261109_023425.xlsx` ke tabel `findings` yang sudah ada.
+
+#### Keputusan impor BPK
+
+- Workbook ternyata tidak memiliki sel gabungan untuk 35 baris tanpa kode temuan; beberapa bersebelahan dengan temuan dari tahun berbeda. Baris tersebut dilewati agar identitas tidak salah, sampai kode sumber tersedia.
+- Petakan `Belum Sesuai Rekomendasi` → `Belum Sesuai` dan `Tidak Bisa Ditindaklanjuti` → `Tidak Dapat Ditindaklanjuti`.
+- Lewati baris berstatus `Input SIPTL` karena belum ada padanan yang disepakati di status BPK.
+- Nilai temuan kosong disimpan sebagai `0`, mengikuti constraint/default kolom yang ada.
+- Cocokkan melalui natural key. Temuan yang cocok boleh diperbarui pada kolom resmi impor; temuan yang tidak ada dalam file tidak dihapus.
+
+#### Selesai bila
+
+- Schema KAP sesuai daftar kolom yang disepakati tanpa mengubah definisi tabel `findings`.
+- Workbook BPK dipetakan ke struktur `findings`; baris `Input SIPTL` dan baris tanpa kode temuan dilaporkan untuk tindak lanjut.
+- Perubahan dan hasil impor dapat ditinjau sebelum pekerjaan UI untuk menu sumber lain dimulai.
 
 ---
 
