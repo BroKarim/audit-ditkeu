@@ -72,6 +72,20 @@ describe('importIdentity', () => {
 });
 
 describe('mapSheetRows', () => {
+  test('maps SILAHAP statuses and empty amounts without inventing missing identities', () => {
+    const { records, skipped } = mapSheetRows([
+      { ...baseRow, 'Nilai Temuan': '', Status: 'Belum Sesuai Rekomendasi' },
+      { ...baseRow, 'Kode Rekomendasi': 'R-02', Status: 'Tidak Bisa Ditindaklanjuti' },
+      { ...baseRow, 'Kode Temuan': '', 'Kode Rekomendasi': 'R-03' },
+      { ...baseRow, 'Kode Rekomendasi': 'R-04', Status: 'Input SIPTL' }
+    ]);
+    expect(records.map((row) => row.status)).toEqual([
+      'Belum Sesuai',
+      'Tidak Dapat Ditindaklanjuti'
+    ]);
+    expect(records[0].nilaiTemuan).toBe(0);
+    expect(skipped.map((row) => row.rowNumber)).toEqual([4, 5]);
+  });
   test('maps an aliased header set into a finding record', () => {
     const { records, skipped } = mapSheetRows([baseRow]);
 

@@ -91,6 +91,22 @@ export const importBatches = pgTable(
   ]
 );
 
+export const kapFindings = pgTable('kap_findings', {
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  tahun: integer('tahun').notNull(),
+  uraianTemuan: text('uraian_temuan'),
+  uraianRekomendasi: text('uraian_rekomendasi'),
+  nilaiTemuan: numeric('nilai_temuan', { precision: 18, scale: 2 }),
+  tanggapanManajemen: text('tanggapan_manajemen'),
+  statusTindakLanjut: text('status_tindak_lanjut'),
+  deskripsiTindakLanjut: text('deskripsi_tindak_lanjut'),
+  hasilAkhir: text('hasil_akhir'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+}).enableRLS();
+
 export const findings = pgTable(
   'findings',
   {

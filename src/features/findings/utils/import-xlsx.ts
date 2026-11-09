@@ -15,7 +15,7 @@ import type { FieldDiff } from './diff';
 
 /** Canonical field -> accepted header spellings (normalised, lowercased). */
 const HEADER_ALIASES: Record<keyof ImportedFinding, string[]> = {
-  noSatker: ['nosatker', 'no satker', 'kode satker', 'kodesatker', 'satker'],
+  noSatker: ['nosatker', 'no satker', 'kode satker', 'kodesatker'],
   tahun: ['tahun', 'tahun pemeriksaan', 'tahunpemeriksaan'],
   kodeTemuan: ['kodetemuan', 'kode temuan'],
   kodeRekomendasi: ['koderekomendasi', 'kode rekomendasi'],
@@ -28,7 +28,7 @@ const HEADER_ALIASES: Record<keyof ImportedFinding, string[]> = {
   alasanDitolak: ['alasanditolak', 'alasan ditolak'],
   tanggalTindakLanjut: ['tangaltindaklanjut', 'tanggal tindak lanjut', 'tanggal tindaklanjut'],
   tanggalTerakhirUpdate: ['tangalterakhirupdate', 'tanggal terakhir update', 'update terakhir'],
-  unitKerja: ['unitkerja', 'unit kerja']
+  unitKerja: ['unitkerja', 'unit kerja', 'satker']
 };
 
 /** Official SILAHAP columns an import may overwrite (context.md). */
@@ -98,7 +98,7 @@ function pickValue(row: Record<string, unknown>, field: keyof ImportedFinding): 
 
 function toText(value: unknown): string {
   if (value === null || value === undefined) return '';
-  return String(value).trim();
+  return String(value).replaceAll(String.fromCharCode(0), '').trim();
 }
 
 /** Accepts `1.845.000.000`, `Rp1.845.000.000`, `1845000000`, `1845000000.00`. */
@@ -183,6 +183,8 @@ export function importIdentity(record: {
 
 function parseStatus(value: unknown): ImportedFinding['status'] | null {
   const text = toText(value);
+  if (normalizeHeader(text) === 'belum sesuai rekomendasi') return 'Belum Sesuai';
+  if (normalizeHeader(text) === 'tidak bisa ditindaklanjuti') return 'Tidak Dapat Ditindaklanjuti';
   const allowed: ImportedFinding['status'][] = [
     'Sesuai Rekomendasi',
     'Belum Sesuai',
@@ -207,12 +209,15 @@ export function mapSheetRows(rows: Record<string, unknown>[]): MappedSheet {
   rows.forEach((row, index) => {
     const rowNumber = index + 2; // +1 header row, +1 for 1-based numbering
 
-    const noSatker = toText(pickValue(row, 'noSatker'));
+    const noSatker =
+      toText(pickValue(row, 'noSatker')) ||
+      toText(Object.entries(row).find(([key]) => normalizeHeader(key) === 'satker')?.[1]);
     const kodeTemuan = toText(pickValue(row, 'kodeTemuan'));
     const kodeRekomendasi = toText(pickValue(row, 'kodeRekomendasi'));
     const tahun = Number(toText(pickValue(row, 'tahun')));
     const status = parseStatus(pickValue(row, 'status'));
-    const nilaiTemuan = parseRupiah(pickValue(row, 'nilaiTemuan'));
+    const nilaiValue = pickValue(row, 'nilaiTemuan');
+    const nilaiTemuan = toText(nilaiValue) === '' ? 0 : parseRupiah(nilaiValue);
 
     const missing = [
       !noSatker && 'NoSatker',

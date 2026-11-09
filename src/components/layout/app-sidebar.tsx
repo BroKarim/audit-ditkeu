@@ -54,13 +54,13 @@ export default function AppSidebar({ appRole }: { appRole: AppRole }) {
           <SidebarMenuItem>
             <SidebarMenuButton
               size='lg'
-              tooltip='Dashboard'
-              render={<Link href='/dashboard/overview' aria-label='Dashboard' />}
+              tooltip='Audit USK'
+              render={<Link href='/dashboard/overview' aria-label='Audit Pemerintah' />}
             >
-              <div className='bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg'>
-                <Icons.logo className='size-4' />
+              <div className='flex aspect-square size-8 shrink-0 items-center justify-center text-green-700 dark:text-green-400'>
+                <Icons.itjen className='size-6' />
               </div>
-              <span className='truncate font-medium'>Dashboard</span>
+              <span className='truncate font-semibold'>Audit Pemerintah</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -111,7 +111,8 @@ export default function AppSidebar({ appRole }: { appRole: AppRole }) {
                     <SidebarMenuButton
                       render={<Link href={item.url} aria-label={item.title} />}
                       tooltip={item.title}
-                      isActive={pathname === item.url}
+                      isActive={pathname === item.url || pathname.startsWith(`${item.url}/`)}
+                      className='h-10 data-[active=true]:bg-green-100 data-[active=true]:text-green-900 dark:data-[active=true]:bg-green-950 dark:data-[active=true]:text-green-100'
                     >
                       <Icon />
                       <span>{item.title}</span>
