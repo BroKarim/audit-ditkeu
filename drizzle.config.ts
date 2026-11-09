@@ -14,6 +14,7 @@ export default defineConfig({
   dbCredentials: {
     // Use Supabase's direct/session connection for DDL when provided. The
     // transaction pooler remains the runtime default for the app.
-    url: process.env.DATABASE_URL_MIGRATION ?? process.env.DATABASE_URL ?? ''
+    url:
+      process.env.DIRECT_URL ?? process.env.DATABASE_URL_MIGRATION ?? process.env.DATABASE_URL ?? ''
   }
 });
