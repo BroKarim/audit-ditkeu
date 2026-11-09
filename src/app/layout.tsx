@@ -16,9 +16,7 @@ const META_THEME_COLORS = {
 };
 
 export const metadata: Metadata = {
-  ...(process.env.NEXT_PUBLIC_APP_URL
-    ? { metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL) }
-    : {}),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://audit-ditkeu.vercel.app'),
   title: {
     default: 'Dashboard Tindak Lanjut Audit USK',
     template: '%s | Audit USK'
