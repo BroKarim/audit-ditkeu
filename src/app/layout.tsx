@@ -20,32 +20,32 @@ export const metadata: Metadata = {
     ? { metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL) }
     : {}),
   title: {
-    default: 'Shadcn Dashboard - Next.js Admin Dashboard Template',
-    template: '%s | Shadcn Dashboard'
+    default: 'Dashboard Tindak Lanjut Audit USK',
+    template: '%s | Audit USK'
   },
   description:
-    'Free, open source admin dashboard starter built with Next.js 16, shadcn/ui, Tailwind CSS, and TypeScript.',
+    'Sistem informasi pemantauan tindak lanjut temuan audit BPK dan KAP Universitas Syiah Kuala.',
   openGraph: {
-    title: 'Shadcn Dashboard - Next.js Admin Dashboard Template',
+    title: 'Dashboard Tindak Lanjut Audit USK',
     description:
-      'Free, open source admin dashboard starter built with Next.js 16, shadcn/ui, Tailwind CSS, and TypeScript.',
-    siteName: 'Shadcn Dashboard',
+      'Sistem informasi pemantauan tindak lanjut temuan audit BPK dan KAP Universitas Syiah Kuala.',
+    siteName: 'Audit USK',
     type: 'website',
     images: [
       {
-        url: '/shadcn-dashboard.png',
-        width: 3200,
-        height: 1600,
-        alt: 'Shadcn Dashboard overview page'
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'Dashboard Tindak Lanjut Audit Universitas Syiah Kuala'
       }
     ]
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Shadcn Dashboard - Next.js Admin Dashboard Template',
+    title: 'Dashboard Tindak Lanjut Audit USK',
     description:
-      'Free, open source admin dashboard starter built with Next.js 16, shadcn/ui, Tailwind CSS, and TypeScript.',
-    images: ['/shadcn-dashboard.png']
+      'Sistem informasi pemantauan tindak lanjut temuan audit BPK dan KAP Universitas Syiah Kuala.',
+    images: ['/opengraph-image']
   }
 };
 
@@ -60,7 +60,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const themeToApply = isValidTheme ? activeThemeValue! : DEFAULT_THEME;
 
   return (
-    <html lang='en' suppressHydrationWarning data-theme={themeToApply}>
+    <html lang='id' suppressHydrationWarning data-theme={themeToApply}>
       <head>
         <script
           dangerouslySetInnerHTML={{

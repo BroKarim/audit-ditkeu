@@ -8,8 +8,8 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
-  title: 'Next Shadcn Dashboard Starter',
-  description: 'Basic dashboard with Next.js and Shadcn',
+  title: 'Dashboard Tindak Lanjut Audit',
+  description: 'Pemantauan tindak lanjut temuan audit Universitas Syiah Kuala.',
   robots: {
     index: false,
     follow: false
