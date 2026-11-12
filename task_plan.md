@@ -185,7 +185,7 @@ Aplikasi internal → role dipangkas menjadi **`user`** dan **`admin`** (`c18321
 
 ### Phase 10 — Dasar data KAP dan impor XLSX BPK
 
-Status: `in_progress` — migrasi tabel KAP sudah diterapkan. Workbook BPK diimpor: 148 dibuat, 0 gagal, 45 dilewati (10 `Input SIPTL`, 35 tanpa kode temuan); penyelesaian baris yang dilewati menunggu data/padanan status.
+Status: `in_progress` — migrasi tabel KAP sudah diterapkan. Rekonsiliasi BPK pada database terkonfigurasi selesai: 148 temuan lama dipasangkan dengan `No` SILAHAP dan 45 ditambahkan; total aktif 193, termasuk 10 berstatus `Input SIPTL` dan 35 tanpa `Kode Temuan`. Impor 193 baris selesai tanpa baris gagal atau dilewati.
 
 Halaman ringkasan dan detail KAP telah dibuat. Workbook KAP 2023 diimpor ke `kap_findings`; baris tanpa uraian temuan dilewati, sedangkan uraian rekomendasi kosong tetap boleh disimpan sebagai `NULL`.
 
@@ -201,19 +201,36 @@ Halaman ringkasan dan detail KAP telah dibuat. Workbook KAP 2023 diimpor ke `kap
 - Siapkan tabel khusus KAP dengan kolom minimal yang disepakati dan satu record per temuan; workbook KAP 2023 sudah dimasukkan.
 - Jangan mengubah tabel `findings` BPK. Impor `data/BPK/SILAHAP_TEMUAN_20261109_023425.xlsx` ke tabel `findings` yang sudah ada.
 
-#### Keputusan impor BPK
+#### Keputusan impor BPK (revisi yang disetujui)
 
-- Workbook ternyata tidak memiliki sel gabungan untuk 35 baris tanpa kode temuan; beberapa bersebelahan dengan temuan dari tahun berbeda. Baris tersebut dilewati agar identitas tidak salah, sampai kode sumber tersedia.
-- Petakan `Belum Sesuai Rekomendasi` → `Belum Sesuai` dan `Tidak Bisa Ditindaklanjuti` → `Tidak Dapat Ditindaklanjuti`.
-- Lewati baris berstatus `Input SIPTL` karena belum ada padanan yang disepakati di status BPK.
-- Nilai temuan kosong disimpan sebagai `0`, mengikuti constraint/default kolom yang ada.
-- Cocokkan melalui natural key. Temuan yang cocok boleh diperbarui pada kolom resmi impor; temuan yang tidak ada dalam file tidak dihapus.
+- Kolom `No` pada ekspor SILAHAP adalah ID sumber yang stabil dan unik untuk setiap temuan pada ekspor berikutnya. Simpan sebagai `silahap_no` (tipe teks agar nilai sumber terjaga) di `findings`, dengan unique constraint/index yang sesuai.
+- Pertahankan `findings.id` UUID sebagai primary key internal karena dipakai foreign key aktivitas, komentar, dan lampiran. `silahap_no` adalah identitas sumber untuk pencocokan impor; jangan mengganti UUID atau `kode_display` dengannya.
+- Impor XLSX selanjutnya mencocokkan **langsung berdasarkan `silahap_no` sebagai identitas utama**, menggantikan natural key `NoSatker + Tahun + KodeTemuan + KodeRekomendasi`. Jangan perlakukan `No` sebagai fallback.
+- `Kode Temuan` tidak wajib untuk impor. Baris tanpa kode temuan tetap diproses jika `No` sumber tersedia. `kode_temuan` perlu nullable di schema/DTO/form bila tidak tersedia; form temuan manual boleh tetap mewajibkannya.
+- `Input SIPTL` adalah status valid tersendiri dan **tidak boleh dilewati** saat impor. Pertahankan status dashboard yang sudah ada, termasuk `Sudah Ditindaklanjuti`, dan tambahkan `Input SIPTL` sebagai status keenam yang terpisah.
+- Pemetaan status sumber tetap: `Belum Sesuai Rekomendasi` → `Belum Sesuai` dan `Tidak Bisa Ditindaklanjuti` → `Tidak Dapat Ditindaklanjuti`; status `Input SIPTL` dipertahankan apa adanya.
+- Temuan yang cocok berdasarkan `silahap_no` boleh memperbarui hanya enam kolom resmi yang sudah diizinkan (status, alasan ditolak, deskripsi tindak lanjut, tanggal tindak lanjut, tanggal terakhir update, nilai temuan). Perubahan kolom internal, UUID, kode display, komentar, lampiran, dan aktivitas lama tidak boleh tertimpa.
+- Baris yang hilang dari ekspor tidak dihapus. Nilai temuan kosong tetap dipetakan ke `0` sesuai perilaku schema saat ini.
+- Migrasi data yang sudah ada: seluruh temuan BPK yang sudah tersimpan harus dipasangkan dengan `silahap_no` dari workbook berdasarkan natural key lama yang masih lengkap. Baris impor terdahulu yang tidak ada di DB harus ikut dibuat dari `No`; bila pemetaan lama ambigu/tidak cocok, laporkan untuk rekonsiliasi dan jangan menebak pasangan.
+- Validasi batch: `No` wajib ada, unik dalam satu workbook, serta unik pada database untuk temuan aktif. Duplikat atau nilai kosong ditandai gagal/dilewati secara eksplisit, tanpa menautkan ke record lain.
 
 #### Selesai bila
 
 - Schema KAP sesuai daftar kolom yang disepakati tanpa mengubah definisi tabel `findings`.
-- Workbook BPK dipetakan ke struktur `findings`; baris `Input SIPTL` dan baris tanpa kode temuan dilaporkan untuk tindak lanjut.
+- Workbook BPK mengimpor seluruh baris valid termasuk status `Input SIPTL` dan baris tanpa `Kode Temuan`, dengan pencocokan berbasis `No` SILAHAP.
 - Perubahan dan hasil impor dapat ditinjau sebelum pekerjaan UI untuk menu sumber lain dimulai.
+
+#### Rencana implementasi lanjutan: identitas SILAHAP
+
+1. Tambahkan `silahap_no` ke schema `findings` dan migrasi Drizzle; buat unique index yang menangani soft delete secara konsisten.
+2. Buat migrasi backfill dari workbook untuk 148 record saat ini menggunakan natural key lama; verifikasi semua pasangan satu-ke-satu sebelum mengisi kolom `NOT NULL`/unique. Jangan ubah UUID internal.
+3. Ubah parser: petakan kolom XLSX `No`, validasi keberadaan dan duplikasi, izinkan `kode_temuan` kosong, dan kenali `Input SIPTL` sebagai status valid.
+4. Ubah import core supaya lookup existing rows, deduplikasi workbook, dan update memakai `silahap_no`; hapus natural key lama sebagai aturan pencocokan impor. Tetap simpan natural key field lain sebagai atribut data, bukan identity import.
+5. Sesuaikan tipe status di domain, validasi DB, pilihan filter/form/badge/tampilan KPI yang relevan. Pastikan enam status dashboard dapat dibaca dari DB.
+6. Perbarui ringkasan batch/hasil verifikasi: 193 baris sumber, jumlah created/updated/unchanged/skipped/failed aktual, dan alasan setiap baris yang tidak bisa diproses.
+7. Tambahkan/ubah tes parser dan import core untuk: status `Input SIPTL`, temuan tanpa kode temuan, pencocokan stabil lintas ekspor via `No`, duplikat/missing `No`, dan tidak tertimpanya data internal.
+
+Implementasi dan impor di branch `codex/import-silahap-no-identity` sudah dikerjakan; perubahan branch masih perlu ditinjau sebelum digabungkan.
 
 ---
 

@@ -132,10 +132,10 @@ function FindingsTableResult({
   const columns = React.useMemo<ColumnDef<Finding>[]>(
     () => [
       {
-        accessorKey: 'kodeDisplay',
+        accessorKey: 'silahapNo',
         header: 'ID',
         cell: ({ row }) => (
-          <span className='font-medium whitespace-nowrap'>{row.original.kodeDisplay}</span>
+          <span className='font-medium whitespace-nowrap'>{row.original.silahapNo ?? '—'}</span>
         )
       },
       {
@@ -163,15 +163,12 @@ function FindingsTableResult({
         cell: ({ row }) => <span className='whitespace-nowrap'>{row.original.kodeTemuan}</span>
       },
       {
-        accessorKey: 'kodeRekomendasi',
-        header: 'Kode Rekomendasi',
-        cell: ({ row }) => <span className='whitespace-nowrap'>{row.original.kodeRekomendasi}</span>
-      },
-      {
         accessorKey: 'judulPemeriksaan',
         header: 'Judul Pemeriksaan',
         cell: ({ row }) => (
-          <span className='block min-w-[16rem]'>{row.original.judulPemeriksaan}</span>
+          <span className='block w-48 max-w-full whitespace-normal break-words'>
+            {row.original.judulPemeriksaan}
+          </span>
         )
       },
       {

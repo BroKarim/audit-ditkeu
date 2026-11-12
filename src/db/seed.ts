@@ -70,7 +70,7 @@ async function seedFindings(): Promise<{ inserted: number; skipped: number }> {
     .insert(findings)
     .values(BPK_FINDINGS.map(toFindingValues))
     .onConflictDoNothing({
-      target: [findings.noSatker, findings.tahun, findings.kodeTemuan, findings.kodeRekomendasi],
+      target: findings.kodeDisplay,
       where: sql`deleted_at is null`
     })
     .returning({ id: findings.id, kodeDisplay: findings.kodeDisplay });

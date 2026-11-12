@@ -115,9 +115,10 @@ export const findings = pgTable(
       .default(sql`gen_random_uuid()`),
     // Filled by the hand-written BEFORE INSERT trigger when omitted (D31).
     kodeDisplay: text('kode_display').notNull(),
+    silahapNo: text('silahap_no'),
     noSatker: text('no_satker').notNull(),
     tahun: integer('tahun').notNull(),
-    kodeTemuan: text('kode_temuan').notNull(),
+    kodeTemuan: text('kode_temuan'),
     kodeRekomendasi: text('kode_rekomendasi').notNull(),
     judulPemeriksaan: text('judul_pemeriksaan').notNull(),
     uraianTemuan: text('uraian_temuan').notNull(),
@@ -143,8 +144,8 @@ export const findings = pgTable(
   },
   (t) => [
     // Partial unique business keys: re-importing a soft-deleted finding works (D30).
-    uniqueIndex('findings_natural_key_uq')
-      .on(t.noSatker, t.tahun, t.kodeTemuan, t.kodeRekomendasi)
+    uniqueIndex('findings_silahap_no_uq')
+      .on(t.silahapNo)
       .where(sql`deleted_at is null`),
     uniqueIndex('findings_kode_display_uq')
       .on(t.kodeDisplay)
@@ -155,7 +156,7 @@ export const findings = pgTable(
     index('findings_last_import_batch_idx').on(t.lastImportBatchId),
     check(
       'findings_status_check',
-      sql`${t.status} in ('Sesuai Rekomendasi', 'Belum Sesuai', 'Belum Ditindaklanjuti', 'Sudah Ditindaklanjuti', 'Tidak Dapat Ditindaklanjuti')`
+      sql`${t.status} in ('Sesuai Rekomendasi', 'Belum Sesuai', 'Belum Ditindaklanjuti', 'Sudah Ditindaklanjuti', 'Tidak Dapat Ditindaklanjuti', 'Input SIPTL')`
     )
   ]
 );

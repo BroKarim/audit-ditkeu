@@ -9,6 +9,7 @@ import {
 } from './import-xlsx';
 
 const baseRow = {
+  No: '123',
   NoSatker: 'USK-01',
   Tahun: 2024,
   'Kode Temuan': 'T-01',
@@ -75,16 +76,18 @@ describe('mapSheetRows', () => {
   test('maps SILAHAP statuses and empty amounts without inventing missing identities', () => {
     const { records, skipped } = mapSheetRows([
       { ...baseRow, 'Nilai Temuan': '', Status: 'Belum Sesuai Rekomendasi' },
-      { ...baseRow, 'Kode Rekomendasi': 'R-02', Status: 'Tidak Bisa Ditindaklanjuti' },
-      { ...baseRow, 'Kode Temuan': '', 'Kode Rekomendasi': 'R-03' },
-      { ...baseRow, 'Kode Rekomendasi': 'R-04', Status: 'Input SIPTL' }
+      { ...baseRow, No: '124', 'Kode Rekomendasi': 'R-02', Status: 'Tidak Bisa Ditindaklanjuti' },
+      { ...baseRow, No: '125', 'Kode Temuan': '', 'Kode Rekomendasi': 'R-03' },
+      { ...baseRow, No: '126', 'Kode Rekomendasi': 'R-04', Status: 'Input SIPTL' }
     ]);
     expect(records.map((row) => row.status)).toEqual([
       'Belum Sesuai',
-      'Tidak Dapat Ditindaklanjuti'
+      'Tidak Dapat Ditindaklanjuti',
+      'Belum Sesuai',
+      'Input SIPTL'
     ]);
     expect(records[0].nilaiTemuan).toBe(0);
-    expect(skipped.map((row) => row.rowNumber)).toEqual([4, 5]);
+    expect(skipped).toEqual([]);
   });
   test('maps an aliased header set into a finding record', () => {
     const { records, skipped } = mapSheetRows([baseRow]);
@@ -106,9 +109,9 @@ describe('mapSheetRows', () => {
   test('skips rows without identity, with unknown status, or duplicated in-file', () => {
     const { records, skipped } = mapSheetRows([
       { ...baseRow },
-      { ...baseRow, 'Kode Temuan': '' },
-      { ...baseRow, 'Kode Temuan': 'T-02', Status: 'Status Aneh' },
-      { ...baseRow, 'Nilai Temuan': 'bukan angka', 'Kode Temuan': 'T-03' },
+      { ...baseRow, No: '' },
+      { ...baseRow, No: '124', 'Kode Temuan': 'T-02', Status: 'Status Aneh' },
+      { ...baseRow, No: '125', 'Nilai Temuan': 'bukan angka', 'Kode Temuan': 'T-03' },
       { ...baseRow }
     ]);
 

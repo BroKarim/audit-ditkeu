@@ -30,6 +30,7 @@ function buildWorkbook(rows: Record<string, unknown>[]): Buffer {
 }
 
 const rowA = {
+  No: 'TSTIMP-001',
   NoSatker: `${PREFIX}-01`,
   Tahun: 2035,
   'Kode Temuan': 'T-01',
@@ -48,6 +49,7 @@ const rowA = {
 
 const rowB = {
   ...rowA,
+  No: 'TSTIMP-002',
   NoSatker: 'TSTIMP-H1',
   Tahun: 2036,
   'Kode Temuan': 'T-H2',
@@ -146,11 +148,7 @@ describe('applyImport', () => {
     expect(Object.keys(updateActivity?.metadata as object)).not.toContain('unitKerja');
 
     // 4) rows missing identity are skipped but reported, batch status reflects it
-    const fourth = await applyImport(
-      buildWorkbook([{ ...rowA, 'Kode Temuan': '' }]),
-      'uji-4.xlsx',
-      actor
-    );
+    const fourth = await applyImport(buildWorkbook([{ ...rowA, No: '' }]), 'uji-4.xlsx', actor);
     expect(fourth.status).toBe('failed');
     expect(fourth.skipped.length).toBe(1);
 
@@ -200,11 +198,7 @@ describe('applyImport', () => {
 
     // 3) a batch that never matches rowB leaves it "not seen in this file";
     //    NULL `last_seen_in_import_at` stays out of the count (seed rows).
-    const third = await applyImport(
-      buildWorkbook([{ ...rowB, 'Kode Temuan': '' }]),
-      'uji-hash-3.xlsx',
-      actor
-    );
+    const third = await applyImport(buildWorkbook([{ ...rowB, No: '' }]), 'uji-hash-3.xlsx', actor);
     expect(third.status).toBe('failed');
     expect(third.staleActiveRows).toBe(baseline + 1);
   }, 30_000);

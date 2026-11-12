@@ -61,10 +61,11 @@ type AttachmentRow = typeof attachments.$inferSelect;
 function toFindingDTO(row: FindingRow): Finding {
   return {
     id: row.id,
+    silahapNo: row.silahapNo,
     kodeDisplay: row.kodeDisplay,
     noSatker: row.noSatker,
     tahun: row.tahun,
-    kodeTemuan: row.kodeTemuan,
+    kodeTemuan: row.kodeTemuan ?? '',
     kodeRekomendasi: row.kodeRekomendasi,
     judulPemeriksaan: row.judulPemeriksaan,
     uraianTemuan: row.uraianTemuan,
@@ -156,6 +157,7 @@ function buildConditions(filters: FindingFilters): SQL[] {
   if (filters.q) {
     const needle = `%${filters.q}%`;
     const qMatch = or(
+      ilike(findings.silahapNo, needle),
       ilike(findings.kodeDisplay, needle),
       ilike(findings.noSatker, needle),
       ilike(findings.kodeTemuan, needle),
@@ -334,7 +336,7 @@ export async function getFindingFilterOptions(): Promise<FindingFilterOptions> {
       tahun: sql<number[] | null>`array_agg(distinct ${findings.tahun} order by ${findings.tahun})`,
       kodeTemuan: sql<
         string[] | null
-      >`array_agg(distinct ${findings.kodeTemuan} order by ${findings.kodeTemuan})`,
+      >`array_agg(distinct ${findings.kodeTemuan} order by ${findings.kodeTemuan}) filter (where ${findings.kodeTemuan} is not null and ${findings.kodeTemuan} <> '')`,
       kodeRekomendasi: sql<
         string[] | null
       >`array_agg(distinct ${findings.kodeRekomendasi} order by ${findings.kodeRekomendasi})`

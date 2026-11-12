@@ -15,6 +15,7 @@ import type { FieldDiff } from './diff';
 
 /** Canonical field -> accepted header spellings (normalised, lowercased). */
 const HEADER_ALIASES: Record<keyof ImportedFinding, string[]> = {
+  silahapNo: ['no'],
   noSatker: ['nosatker', 'no satker', 'kode satker', 'kodesatker'],
   tahun: ['tahun', 'tahun pemeriksaan', 'tahunpemeriksaan'],
   kodeTemuan: ['kodetemuan', 'kode temuan'],
@@ -42,6 +43,7 @@ export const OFFICIAL_IMPORT_FIELDS = [
 ] as const;
 
 export interface ImportedFinding {
+  silahapNo: string;
   noSatker: string;
   tahun: number;
   kodeTemuan: string;
@@ -190,7 +192,8 @@ function parseStatus(value: unknown): ImportedFinding['status'] | null {
     'Belum Sesuai',
     'Belum Ditindaklanjuti',
     'Sudah Ditindaklanjuti',
-    'Tidak Dapat Ditindaklanjuti'
+    'Tidak Dapat Ditindaklanjuti',
+    'Input SIPTL'
   ];
   const match = allowed.find((status) => normalizeHeader(status) === normalizeHeader(text));
   return match ?? null;
@@ -209,6 +212,7 @@ export function mapSheetRows(rows: Record<string, unknown>[]): MappedSheet {
   rows.forEach((row, index) => {
     const rowNumber = index + 2; // +1 header row, +1 for 1-based numbering
 
+    const silahapNo = toText(pickValue(row, 'silahapNo'));
     const noSatker =
       toText(pickValue(row, 'noSatker')) ||
       toText(Object.entries(row).find(([key]) => normalizeHeader(key) === 'satker')?.[1]);
@@ -221,7 +225,7 @@ export function mapSheetRows(rows: Record<string, unknown>[]): MappedSheet {
 
     const missing = [
       !noSatker && 'NoSatker',
-      !kodeTemuan && 'KodeTemuan',
+      !silahapNo && 'No',
       !kodeRekomendasi && 'KodeRekomendasi',
       (!tahun || Number.isNaN(tahun)) && 'Tahun'
     ].filter(Boolean);
@@ -239,7 +243,7 @@ export function mapSheetRows(rows: Record<string, unknown>[]): MappedSheet {
       return;
     }
 
-    const identity = importIdentity({ noSatker, tahun, kodeTemuan, kodeRekomendasi });
+    const identity = silahapNo;
     if (seen.has(identity)) {
       skipped.push({ rowNumber, reason: 'Duplikat di dalam berkas (baris pertama dipakai)' });
       return;
@@ -249,6 +253,7 @@ export function mapSheetRows(rows: Record<string, unknown>[]): MappedSheet {
     const tanggalTerakhirUpdate = parseDate(pickValue(row, 'tanggalTerakhirUpdate')) ?? new Date();
 
     records.push({
+      silahapNo,
       noSatker,
       tahun,
       kodeTemuan,

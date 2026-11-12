@@ -36,6 +36,7 @@ export const navGroups: NavGroup[] = [
       {
         title: 'BPKP',
         url: '/dashboard/bpkp',
+        disabled: true,
         icon: 'bpkp',
         isActive: false,
         shortcut: ['d', 'd'],
@@ -44,6 +45,7 @@ export const navGroups: NavGroup[] = [
       {
         title: 'ITJEN',
         url: '/dashboard/itjen',
+        disabled: true,
         icon: 'itjen',
         isActive: false,
         shortcut: ['d', 'd'],

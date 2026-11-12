@@ -109,7 +109,10 @@ export default function AppSidebar({ appRole }: { appRole: AppRole }) {
                 ) : (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
-                      render={<Link href={item.url} aria-label={item.title} />}
+                      render={
+                        item.disabled ? undefined : <Link href={item.url} aria-label={item.title} />
+                      }
+                      disabled={item.disabled}
                       tooltip={item.title}
                       isActive={pathname === item.url || pathname.startsWith(`${item.url}/`)}
                       className='h-10 data-[active=true]:bg-green-100 data-[active=true]:text-green-900 dark:data-[active=true]:bg-green-950 dark:data-[active=true]:text-green-100'

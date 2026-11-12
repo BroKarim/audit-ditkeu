@@ -24,7 +24,7 @@ import * as XLSX from 'xlsx';
 import { db } from '@/db/client';
 import { activities, findings, importBatches } from '@/db/schema';
 import { ValidationError } from '@/lib/errors';
-import { diffOfficialFields, importIdentity, mapSheetRows } from '../utils/import-xlsx';
+import { diffOfficialFields, mapSheetRows } from '../utils/import-xlsx';
 
 export interface ImportSummary {
   batchId: string;
@@ -130,16 +130,13 @@ export async function applyImport(
     }
 
     const existingRows = await tx.select().from(findings).where(isNull(findings.deletedAt));
+    if (existingRows.some((row) => row.lastImportBatchId && !row.silahapNo)) {
+      throw new ValidationError(
+        'Data impor lama belum dipasangkan dengan No SILAHAP. Jalankan rekonsiliasi terlebih dahulu.'
+      );
+    }
     const byIdentity = new Map(
-      existingRows.map((row) => [
-        importIdentity({
-          noSatker: row.noSatker,
-          tahun: row.tahun,
-          kodeTemuan: row.kodeTemuan,
-          kodeRekomendasi: row.kodeRekomendasi
-        }),
-        row
-      ])
+      existingRows.filter((row) => row.silahapNo).map((row) => [row.silahapNo, row])
     );
 
     let created = 0;
@@ -153,7 +150,7 @@ export async function applyImport(
     const attemptedExistingIds: string[] = [];
 
     for (const record of records) {
-      const existing = byIdentity.get(importIdentity(record));
+      const existing = byIdentity.get(record.silahapNo);
       if (existing) {
         attemptedExistingIds.push(existing.id);
       }
@@ -166,9 +163,10 @@ export async function applyImport(
               .insert(findings)
               .values({
                 kodeDisplay: sql`default`,
+                silahapNo: record.silahapNo,
                 noSatker: record.noSatker,
                 tahun: record.tahun,
-                kodeTemuan: record.kodeTemuan,
+                kodeTemuan: record.kodeTemuan || null,
                 kodeRekomendasi: record.kodeRekomendasi,
                 judulPemeriksaan: record.judulPemeriksaan,
                 uraianTemuan: record.uraianTemuan,

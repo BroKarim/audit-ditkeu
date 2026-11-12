@@ -12,14 +12,16 @@ export type FindingStatus =
   | 'Belum Sesuai'
   | 'Belum Ditindaklanjuti'
   | 'Sudah Ditindaklanjuti'
-  | 'Tidak Dapat Ditindaklanjuti';
+  | 'Tidak Dapat Ditindaklanjuti'
+  | 'Input SIPTL';
 
 export const FINDING_STATUSES: FindingStatus[] = [
   'Sesuai Rekomendasi',
   'Belum Sesuai',
   'Belum Ditindaklanjuti',
   'Sudah Ditindaklanjuti',
-  'Tidak Dapat Ditindaklanjuti'
+  'Tidak Dapat Ditindaklanjuti',
+  'Input SIPTL'
 ];
 
 /**
@@ -32,7 +34,8 @@ export const STATUS_PRIORITY: Record<FindingStatus, number> = {
   'Belum Sesuai': 1,
   'Sudah Ditindaklanjuti': 2,
   'Sesuai Rekomendasi': 3,
-  'Tidak Dapat Ditindaklanjuti': 4
+  'Tidak Dapat Ditindaklanjuti': 4,
+  'Input SIPTL': 5
 };
 
 export type FindingSort =
@@ -66,6 +69,7 @@ export function toFindingSort(value: string | undefined): FindingSort {
 
 export interface Finding {
   id: string;
+  silahapNo: string | null;
   kodeDisplay: string;
   noSatker: string;
   tahun: number;

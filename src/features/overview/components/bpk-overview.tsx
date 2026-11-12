@@ -6,8 +6,6 @@ import type { AppRole } from '@/types';
 import { BpkActivityPanel } from './bpk-activity-panel';
 import { BpkFindingsTable } from './bpk-findings-table';
 import { BpkKpiCards } from './bpk-kpi-cards';
-import { BpkYearChart } from './bpk-year-chart';
-import { BpkYearValueChart } from './bpk-year-value-chart';
 import {
   BpkActivityPanelSkeleton,
   BpkKpiCardsSkeleton,

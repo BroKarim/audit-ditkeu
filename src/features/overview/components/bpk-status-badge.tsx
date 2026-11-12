@@ -7,7 +7,8 @@ const STATUS_BADGE_VARIANT: Record<FindingStatus, 'default' | 'secondary' | 'out
   'Belum Sesuai': 'outline',
   'Sudah Ditindaklanjuti': 'secondary',
   'Sesuai Rekomendasi': 'secondary',
-  'Tidak Dapat Ditindaklanjuti': 'outline'
+  'Tidak Dapat Ditindaklanjuti': 'outline',
+  'Input SIPTL': 'outline'
 };
 
 const STATUS_BADGE_CLASS: Record<FindingStatus, string> = {
@@ -15,7 +16,8 @@ const STATUS_BADGE_CLASS: Record<FindingStatus, string> = {
   'Belum Sesuai': 'border-destructive/40 text-destructive',
   'Sudah Ditindaklanjuti': 'border-transparent',
   'Sesuai Rekomendasi': 'border-transparent',
-  'Tidak Dapat Ditindaklanjuti': 'text-muted-foreground'
+  'Tidak Dapat Ditindaklanjuti': 'text-muted-foreground',
+  'Input SIPTL': 'text-muted-foreground'
 };
 
 export function StatusBadge({ status, className }: { status: FindingStatus; className?: string }) {
